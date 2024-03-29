@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+//use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -16,7 +17,7 @@ class AuthController extends Controller
     function registr(Request $request){
         $request->validate([
             'name'=>'required',
-            'email'=>'required|email',
+            'email'=>'required|unique:App\Models\User|email',
             'password'=>'required|min:6',
         ]);
         // $response=[
@@ -24,13 +25,39 @@ class AuthController extends Controller
         //     'email'=>$request->email,
         //     'password'=>$request->password,
         // ];
-        User::create([
+        $user = User::create([
             'name'=>$request->name,
             'email'=>$request->email,
             'password'=>Hash::make($request->password),
         ]);
-        return redirect('/');
+        $user->createToken('MyAppTokens');
+        return redirect()->route('login');
         //return response()->json($response);
        // var_dump(request('name'));
+    }
+
+    function login(){
+        return view('auth.signup');
+    }
+    function signup(Request $request){
+        $credentials = $request->validate([
+            'email'=>'required',
+            'password'=>'required',
+        ]);
+        if (Auth::attempt($credentials)){
+            $request->session()->regenerate();
+            return redirect()->intended('/article');
+        } 
+        return back()->withErrors([
+            'email'=> 'The provided credentials do not match our records',
+        ])->onlyInput('email');
+    }
+    function logout(Request $request){
+        //$session = $request->session()->all();
+        //Log::add($session);
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 }

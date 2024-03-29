@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,6 +45,10 @@ class User extends Authenticatable
     ];
 
     function article(){
-    return hasMany(Article::class);
+    return $this->hasMany(Article::class);
+    }
+
+    function comment(){
+    return $this->hasMany(Article::class);
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,12 +16,21 @@ use App\Http\Controllers\ArticleController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::resource('article', ArticleCOntroller::class);
+//Comment
+//Route::post('comment', [CommentController::class, 'store']);
+Route::resource('comment', CommentController::class);
 
-Route::get('signin',[AuthController::class,'signin']);
-Route::post('registr',[AuthController::class,'registr']);
+//Article
+Route::resource('article', ArticleController::class)->middleware('auth:sanctum');
 
+//Auth
+Route::get('signin', [AuthController::class, 'signin']);
+Route::post('registr', [AuthController::class, 'registr']);
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('signup', [AuthController::class, 'signup']);
+Route::get('logout', [AuthController::class, 'logout']);
 
+//MainController
 Route::get('/', [MainController::class, 'index']);
 Route::get('/full-img/{img}', [MainController::class, 'show']);
 

@@ -30,6 +30,9 @@
         <a class="nav-link" href="/article">Articles<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item active">
+        <a class="nav-link" href="/article/create">Create<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item active">
         <a class="nav-link" href="/contacts">Contacts<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
@@ -49,8 +52,13 @@
 
     </ul>
     <div class="form-inline my-2 my-lg-0">
+      @guest
       <a href="/signin" class="btn btn-outline-success mr-2 my-2 my-sm-0">Sign In</a>
-      <a href="/signup" class="btn btn-outline-success my-2 my-sm-0">Sign Up</a>
+      <a href="/login" class="btn btn-outline-success my-2 my-sm-0">Sign Up</a>
+      @endguest
+      @auth
+      <a href="/logout" class="btn btn-outline-success my-2 my-sm-0">Log Out</a>
+      @endauth
 </div>
   </div>
 </nav>
