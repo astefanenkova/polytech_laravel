@@ -35,6 +35,13 @@
       <li class="nav-item active">
         <a class="nav-link" href="/contacts">Contacts<span class="sr-only">(current)</span></a>
       </li>
+
+      @can('accept')
+      <li class="nav-item">
+        <a class="nav-link" href="/comment">New comments</a>
+      </li>
+      @endcan
+
       <li class="nav-item">
         <a class="nav-link" href="#">Link</a>
       </li>

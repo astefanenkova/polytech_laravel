@@ -17,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        Article::class=>ArticleControllerPolicy::class,
     ];
 
     /**
@@ -25,6 +25,13 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function(User $user){
+            if ($user->role=="moderator") return true;
+        });
+        Gate::define('accept',function(User $user){
+            if ($user->role=="moderator") return true;
+            
+        });
         Gate::define('comment', function(User $user,Comment $comment){
             return ($comment->user_id == $user->id) ? 
             Response::allow() :

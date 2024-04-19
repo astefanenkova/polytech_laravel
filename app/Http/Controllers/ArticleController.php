@@ -6,6 +6,8 @@ use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Auth\Access\Response;
 
 
 class ArticleController extends Controller
@@ -25,6 +27,7 @@ class ArticleController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create',[self::class]);
         return view('article.create');
     }
 
@@ -52,7 +55,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        $comments = Comment::where('article_id',$article->id)->get();
+        $comments = Comment::where(['article_id'=>$article->id, 'accept'=>true])->get();
         return view('article.show', ['article'=>$article,'comments'=>$comments]);
     }
 
@@ -61,7 +64,8 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        return view('article.edit', ['article'=>$article]);
+        Gate::authorize('update',[self::class, $article]);
+        return redirect()->route('article.index');
     }
 
     /**
@@ -87,6 +91,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
+        Gate::authorize('delete',[self::class, $article]);
         $article->delete();
         return redirect()->route('article.index');
     }

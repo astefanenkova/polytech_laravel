@@ -16,6 +16,11 @@
 </div>
 
 <h4>Comments</h4>
+
+@if(session('res'))
+<div class="alert alert-primary" role="alert"><strong>Warning!</strong> <a href="#" class="alert-link"></a></div>
+@endif
+
 <form action="/comment" method="post">
   @csrf
   <input type="hidden" name ="article_id" value="{{$article->id}}">
