@@ -18,7 +18,7 @@
 <h4>Comments</h4>
 
 @if(session('res'))
-<div class="alert alert-primary" role="alert"><strong>Warning!</strong> <a href="#" class="alert-link"></a></div>
+<div class="alert alert-primary" role="alert"><strong>Ваш комментарий отправлен на модерацию</strong> <a href="#" class="alert-link"></a></div>
 @endif
 
 <form action="/comment" method="post">
