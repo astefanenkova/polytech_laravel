@@ -20,8 +20,10 @@ use App\Http\Controllers\CommentController;
 //Route::post('comment', [CommentController::class, 'store']);
 Route::resource('comment', CommentController::class);
 Route::controller(CommentController::class)->group(function(){
-Route::get('comment/{comment}/accept', 'accept');
-Route::get('comment/{comment}/reject', 'reject');
+    Route::post('comment', 'store');
+    Route::get('comment', 'index')->name('comment.index');
+    Route::get('comment/{comment}/accept', 'accept');
+    Route::get('comment/{comment}/reject', 'reject');
 });
 
 //Article

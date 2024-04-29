@@ -39,11 +39,11 @@ class ArticleControllerPolicy
      */
     public function update(User $user, Article $article)
     {
-        return ($user->role == 'moderator') ?
-        Response::allow() :
-        Response::deny('not moderator!');
+        // return ($user->role == 'moderator') ?
+        // Response::allow() :
+        // Response::deny('not moderator!');
         //if ($user->role == 'moderator') return true;
-        //return $user->role == 'moderator';
+        return $user->role == 'moderator';
     }
 
     /**

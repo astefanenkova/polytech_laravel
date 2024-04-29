@@ -13,6 +13,6 @@ class Article extends Model
     return $this->belongsTo(User::class);
     }
     function comment(){
-        return $this->hasMany(User::class);
+        return $this->hasMany(Comment::class);
         }
     }

@@ -29,12 +29,14 @@ class CommentController extends Controller
     }
 
     public function accept(Comment $comment){
-        $comment->accept='true';
+        // Log::alert($comment);
+        $comment->accept = 'true';
         $comment->save();
         return redirect()->route('comment.index');
     }
+    
     public function reject(Comment $comment){
-        $comment->accept='false';
+        $comment->accept = 'false';
         $comment->save();
         return redirect()->route('comment.index');
     }

@@ -14,6 +14,9 @@
     @foreach($comments as $comment)
     <tr>
       <th scope="row">{{$comment->title}}</th>
+      <th scope="row">{{$comment->text}}</th>
+      <th scope="row">{{$comment->article_name}}</th>
+
       <td>{{$comment->text}}</td>
       <td><a href="/article/{{$comment->article_id}}">{{$comment->article_name}}</a></td>
       <td>{{$comment->name}}</td>
