@@ -7,6 +7,8 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Access\Response;
 use App\Events\ArticleEvent;
 
@@ -18,8 +20,12 @@ class ArticleController extends Controller
      */
     public function index()
     {
+        $currentPage=request('page') ? request('page'):1;
+        $articles = Cache::remember('articles'.$currentPage,3000,function(){
+           return  Article::latest()->paginate(5);
 
-        $articles = Article::latest()->paginate(5);
+        });
+        if(request()->expectsJson()) return response()->json($articles);
         return view('article.index', ['articles'=>$articles]);
     }
 
@@ -37,11 +43,18 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        $caches=DB::table('cache')
+        ->select('key')
+        ->whereRaw('`key` GLOB :param', [':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
         $request->validate([
             'date' =>'required',
             'name'=>'required|min:6',
             'desc'=>'required',
         ]);
+
         $article = new Article;
         $article->date = $request->date;
         $article->name = request('name');
@@ -49,6 +62,7 @@ class ArticleController extends Controller
         $article->user_id = Auth::id();
         $res=$article->save();
         if($res) ArticleEvent::dispatch($article);
+        if($request->expectsJson()) return response()->json($res);
         return redirect()->route('article.index');
     }
 
@@ -57,7 +71,13 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        $comments = Comment::where(['article_id'=>$article->id, 'accept'=>'true'])->get();
+        if(isset($_GET['id_notify'])){
+            auth()->user()->notifications->where('id',$_GET['id_notify'])->first()->markAsRead();
+        }
+        $comments = Cache::rememberForever('comments_'.$article->id,function()use($article){
+        return Comment::where(['article_id'=>$article->id, 'accept'=>'true'])->get();
+        });
+        if(request()->expectsJson()) return response()->json(['article'=>$article,'comments'=>$comments]);
         return view('article.show', ['article'=>$article,'comments'=>$comments]);
     }
 
@@ -67,7 +87,7 @@ class ArticleController extends Controller
     public function edit(Article $article)
     {
         Gate::authorize('update',[self::class, $article]);
-        return redirect()->route('article.index');
+        return view('article.edit', ['article'=>$article]);
     }
 
     /**
@@ -75,6 +95,12 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article)
     {
+        $caches=DB::table('cache')
+        ->select('key')
+        ->whereRaw('`key` GLOB :param', [':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
         $request->validate([
             'date' =>'required',
             'name'=>'required|min:6',
@@ -85,6 +111,7 @@ class ArticleController extends Controller
         $article->desc = request('desc');
         $article->user_id = Auth::id();
         $article->save();
+        if($request->expectsJson()) return response()->json(['article'=>$article->id]);
         return redirect()->route('article.show', ['article'=>$article->id]);
     }
 
@@ -94,7 +121,15 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         Gate::authorize('delete',[self::class, $article]);
-        $article->delete();
+        if ($res=$article->delete()){
+            $caches=DB::table('cache')
+        ->select('key')
+        ->whereRaw('`key` GLOB :param', [':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
+        }
+        if(request()->expectsJson()) return response()->json($res);
         return redirect()->route('article.index');
     }
 }
