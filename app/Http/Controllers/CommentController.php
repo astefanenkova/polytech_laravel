@@ -36,9 +36,8 @@ class CommentController extends Controller
     }
 
     public function accept(Comment $comment){
-        // Log::alert($comment);
+        //Log::alert($comment);
         $users = User::where('id', '!=', $comment->user_id)->get();
-
         $comment->accept = 'true';
         $res=$comment->save();
         if($res) {
